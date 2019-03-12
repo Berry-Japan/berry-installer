@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Berry Linux Installer
+Name[ja]=BERRYのインストール
+Comment=Installer for Berry Linux
+Comment[ja]=「Berry Linux」をインストールします。
+Exec=sudo /opt/berry/berry-installer
+Icon=ksplash
+Type=Application
+Encoding=UTF-8
+Categories=X-Red-Hat-Base;Application;Berry;

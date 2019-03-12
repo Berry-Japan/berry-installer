@@ -1,0 +1,256 @@
+knx-installer (0.3-15) unstable; urgency=low
+
+  * Fixed wrong path of lilo bootgraphics -KK
+
+ -- root <root@Knoppix>  Fri, 13 Aug 2004 11:01:33 +0200
+
+knx-installer (0.3-14) unstable; urgency=low
+
+  * Fixed bug in boot-tools.bm. Thx to "Ancor Gonzalez Sosa"
+    <ancorgs@softhome.net>
+  * Fixed problems with knoppix-installer-latest-web.
+    (User owned certain system files; Thx to Franco Saliola
+    <saliola@math.cornell.edu>)
+
+ -- Fabian Franz <ffranz@Enterprise>  Tue, 29 Jun 2004 23:51:41 +0200
+
+knx-installer (0.3-13) unstable; urgency=low
+
+  * Wolfram release: CMDLINE-Addon Patch for knoppix-autoconfig 
+
+ -- Fabian Franz <ffranz@Enterprise>  Tue, 29 Jun 2004 23:15:34 +0200
+
+knx-installer (0.3-12) unstable; urgency=low
+
+  * Fixed mkext2fs for debian kernels.
+  * Hotfix for knoppix-hd-config. Thx to Wolfram Gloger
+    <wmglo@dent.med.uni-muenchen.de>
+  * Typos in german translation.
+  * Added italian translation. Thx to Marco Ciampa, sent in by Roberto
+    Marchioro <rm@linux.it>.
+  * Create Floppy disk = No by default.
+
+ -- Fabian Franz <debian@fabian-franz.de>  Mon,  7 Jun 2004 01:28:19 +0200
+
+knx-installer (0.3-11) unstable; urgency=low
+
+  * Added automatic download script for the latest installer version. 
+
+ -- Fabian Franz <debian@fabian-franz.de>  Sun, 16 May 2004 05:27:55 +0200
+
+knx-installer (0.3-10) unstable; urgency=low
+
+  * Beginner:
+    * Fixed problem with cups.
+    * Fixed problem with multiple partitions.
+
+  * Fixed copy_etc (fixes invalid passwords after installation)
+  * Disabled startup of services for now on HD ...
+  * Fixed changed menu-entries (reverse of postupgrade)
+  * Removed change to ftp.us.debian.org for now, as it broke things
+
+  ! Added easier user-interface
+  ! $[] is obsolete! (let needed)
+  ! Fixed services start (kdm is problematic)
+  ! Added XF86Config-4 to hw-profile.
+
+ -- Fabian Franz <debian@fabian-franz.de>  Sun,  9 May 2004 19:31:07 +0200
+
+knx-installer (0.3-9) unstable; urgency=low
+
+  * Added german keymap for german language to grub.
+  * Fixed a problem with ppp.
+  * Added some more modules to "blacklist" to exclude from /etc/modules and
+    /etc/modules-$(uname -r)
+  * Added default saved.
+  * Added gfxmenu.
+  * Updated templates/etc/profile for Kanotix.
+
+ -- Fabian Franz <debian@fabian-franz.de>  Fri, 23 Apr 2004 01:17:12 +0200
+
+knx-installer (0.3-8) unstable; urgency=low
+
+  * Sync with Kanotix. 
+
+ -- Fabian Franz <debian@fabian-franz.de>  Sun,  9 May 2004 18:33:55 +0200
+
+knx-installer (0.3-7) unstable; urgency=low
+
+  * Fixed a problem with grub.
+  * Silenced some messages.
+  * Fixed a problem in non-interactive mode.
+  
+ -- Fabian Franz <debian@fabian-franz.de>  Tue, 20 Apr 2004 19:20:25 +0200
+
+knx-installer (0.3-6) unstable; urgency=low
+
+  * Added kdm and apache-utils to dependancies. *ouch*
+  * Added experimental grub support.
+  * Added symlinks for shorter name k2hd and knx2hd for plasticdoc.
+  * Add important parameters to lilo.conf / menu.lst (debian-mode)
+  * Allow installation after nvidia-live-installation
+  * Added even more compatibility to debian. (Set default kernel, set
+    default links, initrd.gz -> initrd.img)
+  * Fixed a problem for the future. (Used /lib/modules of running
+    system)
+  * Added compatibility for after hd-install usage.
+  * Added non-interactive-patch
+  * Fixed mozilla language and other issues.
+  * Hotplug support
+  * Fixed lilo to also use grub for mbr detection.
+  * Removed ReadOnly=1 from mkdesktophdicons.
+  * Added mkdesktophdicons to knoppix-hd-autoconfig for beginner mode.
+  * Sync from Kanotix
+  * Added update-grub to kernel-img.conf
+  * Fixed a typo in module_system (thx to Niall Walsh (bfree from irc))
+  * Fixed users in automount.sh
+  * Set certain packages on hold (those that should be removed on dist-upgrade)
+  * Add vga=... to CMDLINE for grub.
+  * Fixed the annoying proposed username bug.
+  * Added grub boot floppy support. (must still be tested)
+
+ -- Fabian Franz <knoppix-installer@fabian-franz.de>  Tue,  6 Apr 2004 02:48:28 +0200
+
+knx-installer (0.3-5) unstable; urgency=low
+
+  * Changed version number.
+  * Added cs / sk to translations.
+
+ -- Knoppix User <knoppix@Knoppix>  Sun, 28 Mar 2004 21:51:13 +0200
+
+knx-installer (0.3-4) unstable; urgency=low
+
+  * Hotfix for problems with NTFS-Partitions. 
+    (lilo label too long)
+
+ -- Fabian Franz <knoppix-installer@fabian-franz.de>  Fri, 26 Mar 2004 16:42:54 +0100
+
+knx-installer (0.3-3) unstable; urgency=low
+
+  * Fixed bug with permissions of /etc/sudoers/.
+  * Fixed problem with too long translation in copying dialog.
+  * Shutup update-rc.d.
+  * Fixed problems with on-the-fly patches to knoppix-autoconfig
+
+ -- Fabian Franz <ffranz@Voyager>  Sun, 22 Feb 2004 17:11:13 +0100
+
+knx-installer (0.3-2) unstable; urgency=low
+
+  * Added version number
+  * Removed forgotten debug output
+  * Fixed a bug in suknxmenus for partition image.
+  * Added spanish translation (Luis Llorente Campo
+    <luis.llorente@hispalinux.es>)
+  * Added ukrainian translation (Ivan Petrouchtchak <iip@telus.net>)
+
+ -- Knoppix User <knoppix@Knoppix>  Thu, 19 Feb 2004 16:15:13 +0100
+
+knx-installer (0.3-1) unstable; urgency=low
+
+  * Merges from Kano
+  	* Name changes back to Knoppix ;-)
+  	* Deactivated the automatic mounting of partitions again
+  	  but added a variable to check for Kano's Knoppix
+
+  * Cleanup
+  	* Removed mepis-installer, nobody used it
+  	* Improved i18n handling (added scripts)
+  	* Cleaned up the directory mess.
+  	* Added some missing dependencies
+  	* Used again much more modular approach
+  	* Cleaned up the mess wiht old_installer
+
+  * Booting
+  	* Removed own mkinitrd and used debian ones
+  	* Fixed an already fixed but forgotten issue with mbr. :-/
+  	* Removed genliloconf and wrote make_lilo_conf
+  	* Support for multiple kernels / initrds
+  	* Added use of graphical boot
+
+  * Installation
+  	* Knoppix-Mode
+  		* Added knoppix-hd-config
+  		* Added /etc/knoppix directory
+  		* Copied home directory
+  		* Copied changed files in /etc/
+
+  	* The mode now defines the questions asked
+  	* Added new mode (beginner) for half-usage of knoppix-autoconfig
+  	* Added possibility to choose reiserfs
+  	* Fixed suknoppixmenus, some didn't need to get kdesu
+  	! Added file to pin the kde-versions to unstable (?)
+  	* Added "hack" to knoppix-autoconfig for kernel 2.6
+
+  * I18n
+  	* Updated i18n translations
+
+  * Removed knx-templates
+  * Added directory templates
+  * Updated template files
+
+  * Services
+  	* New services concept
+  	* Fixed bugs for Kernel 2.6
+  	  (module-init-tools must also be used in runlevels)
+  	* New: modutils-knoppix (starts modutils & module-init-tools)
+
+  * Added possibility to give an CMDLINE to knoppix-autoconfig
+  * Added knoppix-hd-autoconfig
+  	* Added possiblitity to create a hardware profile for a kernel
+  	* Added automatic creation in beginner mode
+  	* Added question coundown for creation in debian mode
+  	* Added config file in /etc/default/knoppix
+
+ -- Knoppix User <knoppix@Knoppix>  Thu, 19 Feb 2004 06:04:38 -0500
+
+knx-installer (0.2-4) unstable; urgency=low
+
+  * Name changes from Knoppix to Kanotix
+  * Reactivated the fstab fix
+  * Added PCMCIA check
+
+ -- Joerg Schirottke <master@kanotix.de>  Thu, 29 Jan 2004 22:27:20 +0100
+
+knx-installer (0.2-3) unstable; urgency=low
+
+  * Fixed one bug for installation on multiple partitions.
+  * Merged changes from Kano. (see below)
+  * Fixed one problem with swap-files.
+  * Added an error-dialog before the partition menu. (translation?)
+
+ -- Fabian Franz <knx-installer@fabian-franz.de>  Mon,  5 Jan 2004 23:00:54 +0100
+
+knx-installer (0.2-2) unstable; urgency=low
+
+  * Name changes from Knoppix to Kanotix
+  * Fixed some bugs
+  * Hotfix for Kanotix in boot.bm
+
+ -- Joerg Schirottke <master@kanotix.de>  Sun, 21 Dec 2003 22:54:25 +0100
+
+knx-installer (0.2-1) unstable; urgency=low
+
+  * Complete rewrite with more modular approach.
+  * Fixed many bugs.
+
+ -- Fabian Franz <knx-installer@fabian-franz.de>  Mon, 15 Sep 2003 14:10:38 +0200
+
+knx-installer (0.1-3) unstable; urgency=low
+
+  * Added sanity check for progressbar to satisfy Xdialog
+  * Mark additional partitions with 0 2 instead of 0 0
+
+ -- Fabian Franz <knx-@fabian-franz.de>  Fri, 20 Jun 2003 19:44:13 +0200
+
+knx-installer (0.1-2) unstable; urgency=low
+
+  * Fixed some small errors regarding multiple partitions
+
+ -- Fabian Franz <knx-@fabian-franz.de>  Thu, 19 Jun 2003 18:30:00 +0200
+
+knx-installer (0.1-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Fabian Franz <knoppix-installer@fabian-franz.de>  Tue, 15 Apr 2003 22:17:21 +0200
+

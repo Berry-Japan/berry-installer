@@ -1,0 +1,19 @@
+#!/bin/bash
+# Load the modules
+#
+# description: loads the appropriate modules in `boot'.
+# chkconfig: 345 90 12
+
+# Source function library.
+. /etc/init.d/functions
+
+PATH="/sbin:/bin"
+echo -n 'Loading modules: '
+
+dev2mod() { while read dev; do modprobe $dev >/dev/null 2>&1; done }
+cat /sys/bus/*/devices/*/modalias | dev2mod
+modprobe pcmcia
+cat /sys/bus/*/devices/*/modalias | dev2mod
+
+echo
+exit 0

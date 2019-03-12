@@ -1,0 +1,35 @@
+#!/bin/bash
+#
+# Load the modules
+#
+# description: loads the appropriate modules in `boot'.
+# chkconfig: 345 90 12
+
+# Source function library.
+. /etc/init.d/functions
+
+PATH="/sbin:/bin"
+
+# Loop over every line in /etc/modules.
+echo -n 'Loading modules: '
+(cat /etc/modules; echo) | # make sure there is a LF at the end
+while read module args
+do
+	case "$module" in
+		\#*|"") continue ;;
+	esac
+	echo -n "$module "
+	modprobe $module $args
+done
+echo
+
+#
+# Just in case a sysadmin prefers generic symbolic links in
+# /lib/modules/boot for boot time modules we will load these modules
+#
+if [ -n "`modprobe -l -t boot`" ]
+then
+        modprobe -a -t boot \*
+fi
+
+exit 0

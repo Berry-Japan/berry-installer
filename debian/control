@@ -1,0 +1,15 @@
+Source: knx-installer
+Section: knoppix
+Priority: optional
+Maintainer: Fabian Franz <knoppix-installer@fabian-franz.de>
+Build-Depends-Indep: debhelper (>> 4.0.0)
+Standards-Version: 3.6.0
+
+Package: knx-installer
+Architecture: all
+Depends: dialog, initrd-tools, perl, bash (>>2.05), lilo, kdm, apache-utils, grub
+Suggests: qtparted, xdialog
+Description: installs knoppix to hd
+ knoppix-installer is an fully functional installation program
+ to easily install knoppix to hd. It has support for config-files, 
+ which allow more advanced usages.

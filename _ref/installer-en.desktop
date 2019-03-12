@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Berry Linux Installer (jet_blackz@lycos.com Version)
+Name[ja]=BERRYのインストール (jet_blackz@lycos.com版)
+Comment=Installer of Berry Linux
+Comment[ja]=「Berry Linux」をインストールします。
+Exec=kdesu /opt/berry/berry-installer-en
+Icon=ksplash
+Type=Application
+Encoding=UTF-8
+Categories=X-Red-Hat-Base;Application;Berry;

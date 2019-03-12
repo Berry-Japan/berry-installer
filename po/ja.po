@@ -1,0 +1,627 @@
+#: berry-installer:50
+msgid "berry-installer terminated"
+msgstr ""
+
+#: berry-installer:65
+msgid "Save configuration?"
+msgstr "設定の保存"
+
+#: berry-installer:65
+msgid "Do you want to save your configuration?"
+msgstr "設定を保存しますか？"
+
+#: berry-installer:76
+msgid "Berry Linux Installation (ver $VERSION)"
+msgstr "Berry OS インストーラ (ver $VERSION)"
+
+#: berry-installer:77
+msgid "Installation of Berry Linux to Harddisc (Step 0/$MAX)"
+msgstr "ハードディスクへのインストール (Step 0/$MAX)"
+
+#: berry-installer:78
+msgid "Initialisation of Berry Linux-Installation"
+msgstr "Berry OS インストーラの初期化"
+
+#: berry-installer:80
+msgid "Installation failed"
+msgstr "インストール失敗"
+
+#: berry-installer:81
+msgid "Installation successfull"
+msgstr "インストールの成功"
+
+#: berry-installer:82
+msgid "Fatal dialog error"
+msgstr "ダイアログエラー"
+
+#: berry-installer:142
+msgid "Choose System Type"
+msgstr "システムタイプを選ぶ"
+
+#: berry-installer:155
+msgid "Creating Berry Linux Configuration Step (0/$NUM_REAL_MODULES)"
+msgstr "インストール情報の作成 (0/$NUM_REAL_MODULES)"
+
+#: berry-installer:183 berry-installer:185
+msgid ""
+"Error: Unknown value $2 for $1\\nSetting to default value ($DEFAULT_TEMP)."
+msgstr ""
+
+#: berry-installer:194 berry-installer:196
+msgid ""
+"Error: Check failed for $1 ($2)\\nThe configuration module will now be "
+"started."
+msgstr ""
+
+#: berry-installer:211
+msgid "Loading Berry Installer configuration"
+msgstr "インストール情報を読み込む"
+
+#: berry-installer:214
+msgid "Here you can input a filename to load an existing configuration"
+msgstr "ここに既存の設定ファイル名を入力します。"
+
+#: berry-installer:214
+msgid "Input the configuration filename to be loaded"
+msgstr "読み込む設定ファイル名を入力してください"
+
+#: berry-installer:219
+msgid ""
+"File $CONFIG_USER could not be found. The loading of the configuration will "
+"be aborted."
+msgstr "ファイル $CONFIG_USER を見つかられませんでした。設定ファイルを読込めませんでした。"
+
+#: berry-installer:242
+msgid "Saving Berry Installer configuration"
+msgstr ""
+
+#: berry-installer:245
+msgid "Here you can input a filename to save the configuration"
+msgstr "ここに保存する設定ファイル名を入力します。"
+
+#: berry-installer:245
+msgid "Input a filename for the configuration"
+msgstr "保存する設定ファイル名を入力してください"
+
+#: berry-installer:251
+msgid ""
+"If you click yes, the file will be overwritten, otherwise this script will "
+"abort"
+msgstr ""
+
+#: berry-installer:251
+msgid "Do you really want to overwrite $CONFIG_USER?"
+msgstr ""
+
+#: berry-installer:264
+msgid "Possible are:"
+msgstr ""
+
+#: berry-installer:266
+msgid "This value will be checked by function"
+msgstr ""
+
+#: berry-installer:268
+msgid "Default value is:"
+msgstr ""
+
+#: berry-installer:287
+msgid ""
+"Several of this options can only be changed in the Configurationfile "
+"$CONFIG_FILE."
+msgstr "これらの設定は $CONFIG_FILE の中に保存されています。"
+
+#: berry-installer:288
+msgid ""
+"The Installation will now be started. The author gives no warranty against "
+"any damage caused by this script."
+msgstr "インストールを開始します。制作者はこのプログラムを\n使用したいかなる損害も保障しません。"
+
+#: berry-installer:290
+msgid "Do you want to proceed with these parameters?"
+msgstr "これらの設定でインストールしますか?"
+
+#: berry-installer:292
+msgid ""
+"Make sure you agree to all parameters, if so proceed with the installation."
+msgstr "これらの設定でよければ、インストールを行ないます。"
+
+#: berry-installer:302
+msgid "Converting Berry Linux to Red Hat..."
+msgstr ""
+
+#: berry-installer:332 berry-installer:343
+msgid "Starting Berry Linux Installation"
+msgstr "インストールの開始"
+
+#: berry-installer:334
+msgid "Error: No complete Configuration found"
+msgstr ""
+
+#: berry-installer:344 berry-installer:442
+msgid "Installing"
+msgstr ""
+
+#: berry-installer:355
+msgid "Creating boot disk"
+msgstr ""
+
+#: berry-installer:355
+msgid ""
+"Please insert now an empty floppy disk into your floppydrive. Warning: All "
+"data on it will be lost. If you don't want to create a disk you can choose "
+"No."
+msgstr ""
+
+#: berry-installer:374 berry-installer:375
+msgid "Berry Linux was successfully installed to harddisc."
+msgstr "ハードディスクへのインストールに成功しました。"
+
+#: berry-installer:381
+msgid "Berry Linux Main Menu"
+msgstr "メインメニュー"
+
+#: berry-installer:382
+msgid "Thats the main menu\\nChoose the action you want"
+msgstr "これがメインメニューです。\\nまず、Linux用のパーティションを用意し、\\nそれからインストール情報を設定します。\\nどうぞ選んでください。"
+
+#: berry-installer:382 modules/00-hd-tools.bm:181
+msgid "Choose an action"
+msgstr "選んでください"
+
+#: berry-installer:383
+msgid "Configure Installation"
+msgstr "インストール設定"
+
+#: berry-installer:383
+msgid "Create a new configuration"
+msgstr "新しいインストール情報を作成します。"
+
+#: berry-installer:384
+msgid "Start installation"
+msgstr "インストール"
+
+#: berry-installer:384
+msgid "Start the installation"
+msgstr "インストールを行ないます。"
+
+#: berry-installer:385 modules/00-hd-tools.bm:181
+msgid "Partition"
+msgstr "パーティション"
+
+#: berry-installer:385 modules/00-hd-tools.bm:181
+msgid "Partition the hard disk"
+msgstr "パーティションを変更します。"
+
+#: berry-installer:386
+msgid "Load config"
+msgstr "設定の読み込み"
+
+#: berry-installer:386
+msgid "Load an existing configuration"
+msgstr "既存のインストール情報を読み込みます。"
+
+#: berry-installer:387
+msgid "Save config"
+msgstr "設定の保存"
+
+#: berry-installer:387
+msgid "Save the configuration"
+msgstr "インストール情報を保存します。"
+
+#: berry-installer:388 modules/00-hd-tools.bm:181 modules/00-dialog.bm:56
+#: modules/00-dialog.bm:58 modules/00-dialog.bm:64 modules/00-dialog.bm:75
+msgid "Quit"
+msgstr "終了"
+
+#: berry-installer:388 modules/00-hd-tools.bm:181
+msgid "Quit the program"
+msgstr "このプログラムを終了します。"
+
+#: berry-installer:393 berry-installer:428
+msgid "berry-installer started"
+msgstr ""
+
+#: berry-installer:406
+msgid ""
+"The installer detected that the installation requierements are not "
+"fullfilled yet.\\n\\nPlease make sure that you have an free partition with "
+"at least $[ROOT_MIN/(1024*1024)] GB to install berry on. Also we need a swap "
+"partition with at least $[SWAP_MIN/1024] MB, if you don't have 512 MB Memory "
+"or more.\\n\\nIn the following menu, you can start some tools to partition "
+"your harddrive.\\nIf you really really know what you are doing start with: "
+"IGNORE_CHECK=1 sudo berry-installer to avoid the menu."
+msgstr "あと $[ROOT_MIN/(1024*1024)] GB の空き領域が必要です。また 512MB 以上のメモリーを推奨します。"
+
+#: berry-installer:414 berry-installer:431
+msgid "Partition check succeeded"
+msgstr ""
+
+#: berry-installer:435
+msgid ""
+"Config file $CONFIG_FILE could not be found. This is necessary for non-"
+"interactive mode."
+msgstr ""
+
+#: berry-installer:441
+msgid "Starting Berry installation"
+msgstr ""
+
+#: berry-installer:462
+msgid "Berry was successfully installed to hd."
+msgstr "ハードディスクにインストールされました"
+
+#: berry-installer:475
+msgid "root permission needed."
+msgstr ""
+
+#: modules/install/03-system_types.bm:24 modules/install/03-system_types.bm:52
+msgid "Converting Berry to Multi-User-System..."
+msgstr "マルチユーザシステムにしています..."
+
+#: modules/install/02-install-tools.bm:18
+msgid "Copying custom configuration ..."
+msgstr "カスタマイズされた設定をコピーしています..."
+
+#: modules/install/02-install-tools.bm:42
+msgid "Copying home directory ..."
+msgstr "ホームディレクトリーをコピーしています..."
+
+#: modules/install/02-install-tools.bm:202
+msgid "Welcome to Berry Linux"
+msgstr ""
+
+#: modules/install/01-fstab.bm:5
+msgid "Updating /etc/fstab..."
+msgstr "/etc/fstab を更新しています..."
+
+#: modules/booting/boot-tools.bm:633
+msgid "Creating initrd for kernel $BOOT_KERNEL ..."
+msgstr ""
+
+#: modules/booting/boot-tools.bm:655
+msgid "Installing $BOOT_LOADER to $BOOT_WHERE"
+msgstr "$BOOT_LOADER を $BOOT_WHERE にインストールしています"
+
+#: modules/booting/boot-tools.bm:664
+msgid "Finishing installation"
+msgstr "インストールを終了しています"
+
+#: modules/07-system.bm:5
+msgid ""
+"Determines if the system is a redhat-derivate, a copy from CD or a nice mix "
+"of both"
+msgstr ""
+
+#: modules/07-system.bm:11
+msgid "System-Options:"
+msgstr "システムオプション:"
+
+#: modules/07-system.bm:12
+msgid "The installed system will be a $SYSTEM_TYPE type system."
+msgstr "$SYSTEM_TYPE タイプでシステムがインストールされます。"
+
+#: modules/06-boot.bm:9
+msgid "Chooses the Boot-Loader"
+msgstr ""
+
+#: modules/06-boot.bm:10
+msgid "If set to 'yes' a boot disk will be created!"
+msgstr ""
+
+#: modules/06-boot.bm:11
+msgid "Where the Boot-Loader will be installed"
+msgstr ""
+
+#: modules/06-boot.bm:16
+msgid "Bootloader-Options:"
+msgstr "ブートローダーオプション:"
+
+#: modules/06-boot.bm:17
+msgid "A bootdisk will be created."
+msgstr "ブートディスクを作ります。"
+
+#: modules/06-boot.bm:17
+msgid "No bootdisk will be created."
+msgstr "ブートディスクを作りません。"
+
+#: modules/06-boot.bm:18
+msgid "The bootloader $BOOT_LOADER will be used and installed in $BOOT_WHERE."
+msgstr "ブートローダー $BOOT_LOADER は $BOOT_WHERE へインストールされます。"
+
+#: modules/06-boot.bm:30
+msgid ""
+"Here you must choose if you want to install the boot-loader to MBR or to a "
+"partition."
+msgstr "ここで、ブートローダーを MBR(ディスクの先頭) か\nパーティションにインストールするか選びます。"
+
+#: modules/06-boot.bm:30
+msgid "Choose where the boot-loader ($BOOT_LOADER) shall be installed"
+msgstr "どこにブートローダー ($BOOT_LOADER) をインストールするか選んでください"
+
+#: modules/06-boot.bm:30
+msgid "Master Boot Record"
+msgstr "マスターブートレコード"
+
+#: modules/06-boot.bm:30
+msgid "To Root-Partition"
+msgstr "ルートパーティション"
+
+#: modules/05-services.bm:9
+msgid "Services-Options:"
+msgstr "サービス設定:"
+
+#: modules/05-services.bm:10
+msgid ""
+"The following services will be started, after each system bootup: "
+"$SERVICES_START"
+msgstr "次のサービスが起動時に実行されます: $SERVICES_START"
+
+#: modules/05-services.bm:15
+msgid "Possible services are for now: kdm cups ssh samba"
+msgstr ""
+
+#: modules/04-user-name-pass.bm:9
+msgid "Name-Options:"
+msgstr "ユーザー設定:"
+
+#: modules/04-user-name-pass.bm:10
+msgid "Your name is: $NAME_NAME"
+msgstr "あなたの名前は: $NAME_NAME"
+
+#: modules/04-user-name-pass.bm:15
+msgid ""
+"Here you must input your whole name. It is used to create a default user."
+msgstr "ここにあなたの名前を入力してください。\nデフォルトユーザとして使われます。"
+
+#: modules/04-user-name-pass.bm:15
+msgid "Input your whole name (name surname)"
+msgstr "あなたの名前を入力してください"
+
+#: modules/04-user-name-pass.bm:30
+msgid "Your choosen username is: $USER_NAME"
+msgstr "あなたが選んだユーザー名: $USER_NAME"
+
+#: modules/04-user-name-pass.bm:38
+msgid "Here you must input your preferred username. Suggested: $proposal"
+msgstr "ここにあなたのユーザ名を入力してください。例えば: $proposal"
+
+#: modules/04-user-name-pass.bm:38
+msgid "Input your user name (perhaps you like: $proposal)"
+msgstr "ユーザー名を入力してください (例えば: $proposal)"
+
+#: modules/04-user-name-pass.bm:60
+msgid ""
+"Here you must choose the password for the user $USER_NAME and input it "
+"twice. If you have already chosen one, you can leave the fields blank. But "
+"you cannot recover the password once saved, as it is encrypted."
+msgstr "ここには、ユーザ $USER_NAME のパスワードを二度入力してください。"
+
+#: modules/04-user-name-pass.bm:60
+msgid "Input your user-password"
+msgstr "ユーザーのパスワードを入力してください"
+
+#: modules/04-user-name-pass.bm:60
+msgid "Input your user-password again"
+msgstr "確認のためもう一度入力してください"
+
+#: modules/04-user-name-pass.bm:60 modules/04-user-name-pass.bm:80
+msgid "Passwords do not match or no password was given."
+msgstr "パスワードがあっていません。"
+
+#: modules/04-user-name-pass.bm:80
+msgid ""
+"Here you must choose the password for system administration (user root) and "
+"input it twice. If you have already chosen one, you can leave the fields "
+"blank. But you cannot recover the password once saved, as it is encrypted. "
+"Remember that the root-User is the Administrator of the system, so it is a "
+"very important password."
+msgstr "ここには、root (管理者) のパスワードを二度入力してください。"
+
+#: modules/04-user-name-pass.bm:80
+msgid "Input your administration password"
+msgstr "root のパスワードを入力してください"
+
+#: modules/04-user-name-pass.bm:80
+msgid "Input your administration password again"
+msgstr "確認のためもう一度入力してください"
+
+#: modules/03-host.bm:9
+msgid "Your hostname is: $HOST_NAME"
+msgstr "ホスト名: $HOST_NAME"
+
+#: modules/03-host.bm:14
+msgid "berry"
+msgstr ""
+
+#: modules/03-host.bm:15
+msgid "Here you must input your hostname. This is the name of you berry."
+msgstr "ここにホスト名を入力してください。"
+
+#: modules/03-host.bm:15
+msgid "Input your preferred hostname"
+msgstr "ホスト名を入力してください"
+
+#: modules/02-swap.bm:12
+msgid "If set to yes, the swap partitions will be autodetected."
+msgstr ""
+#msgstr "「はい」なら、スワップパーティションを自動検出します。"
+
+#: modules/02-swap.bm:13
+msgid "The swap partitions to be used by the installed Berry Linux."
+msgstr ""
+#msgstr "スワップパーティションは Berry OS で使われます。"
+
+#: modules/02-swap.bm:18
+msgid "Swapspace-Options:"
+msgstr "スワップ関連のオプション:"
+
+#: modules/02-swap.bm:21
+msgid "The autodetected swapdrives $SWAP_CHOICES will be used."
+msgstr "自動検出された $SWAP_CHOICES が使われます。"
+
+#: modules/02-swap.bm:21
+msgid "The choosen swapdrives $SWAP_CHOICES will be used."
+msgstr "$SWAP_CHOICES がスワップとして使われます。"
+
+#: modules/02-swap.bm:23
+msgid "No swap partitions are needed."
+msgstr "スワップパーティションは必要とされていません。"
+
+#: modules/02-swap.bm:39
+msgid "Adding swap-devices to /etc/fstab ..."
+msgstr "スワップデバイスを、/etc/fstab に追加しています..."
+
+#: modules/01-hd.bm:11
+msgid "Determines if the HD should be formatted. (mkfs.*)"
+msgstr ""
+
+#: modules/01-hd.bm:12
+msgid "Sets the Filesystem type."
+msgstr ""
+#msgstr "ファイルシステムタイプ"
+
+#: modules/01-hd.bm:13
+msgid "Here the Berry Linux System will be installed"
+msgstr ""
+#msgstr "ここにシステムがインストールされます。"
+
+#: modules/01-hd.bm:14
+msgid ""
+"Here you can give additional mappings. (Experimental) You need to have the "
+"partitions formatted yourself and give the correct mappings like: \\\"/dev/"
+"hda4:/boot /dev/hda5:/var /dev/hda6:/tmp\\\""
+msgstr ""
+
+#: modules/01-hd.bm:15
+msgid ""
+"If set to yes, the program will NOT check if there is enough space to "
+"install Berry Linux on the selected partition(s). Use at your own risk! "
+"Useful for example with HD_MAP if you only have a small root partition."
+msgstr ""
+
+#: modules/01-hd.bm:21
+msgid "Drive-Options:"
+msgstr "ドライブオプション:"
+
+#: modules/01-hd.bm:22
+msgid "The Drive $HD_CHOICE will be formatted with the $HD_FSTYPE filesystem."
+msgstr "$HD_CHOICE は $HD_FSTYPE ファイルシステムでフォーマットされます。"
+
+#: modules/01-hd.bm:22
+msgid "The Drive $HD_CHOICE will be used for the installation."
+msgstr "$HD_CHOICE はインストールに使用されます。"
+
+#: modules/01-hd.bm:52
+msgid "Copying files. This can take a while. Please be patient."
+msgstr "ファイルをコピーしています。しばらくお待ちください。"
+
+#: modules/01-hd.bm:64
+msgid "Formatting $HD_CHOICE..."
+msgstr "$HD_CHOICE をフォーマットしています..."
+
+#: modules/01-hd.bm:82
+msgid ""
+"Formatting of $HD_CHOICE failed. Some messages from mkfs.$HD_FSTYPE: "
+"$ERROR_MESSAGES"
+msgstr ""
+
+#: modules/01-hd.bm:90
+msgid "Mounting $HD_CHOICE r/w..."
+msgstr "$HD_CHOICE を書き込み可能でマウントしています..."
+
+#: modules/01-hd.bm:96
+msgid ""
+"Mounting of $HD_CHOICE failed. Some messages from mount: $ERROR_MESSAGES"
+msgstr ""
+
+#: modules/01-hd.bm:101
+msgid "Mounting additional partitions r/w..."
+msgstr "そのほかのパーティションをマウントしています..."
+
+#: modules/01-hd.bm:118
+msgid ""
+"Here you must choose one of the available partitions\\n for use with Berry "
+"Linux."
+msgstr "ここでインストールするパーティションを選んでください。"
+
+#: modules/01-hd.bm:118
+msgid "Choose the partition to install Berry Linux"
+msgstr "Berry OS をインストールするパーティションを選んでください"
+
+#: modules/01-hd.bm:131
+msgid "Here you must choose one of the available filesystem types."
+msgstr "ここでファイルシステムを選択します。"
+
+#: modules/01-hd.bm:131
+msgid "Choose filesystem-type."
+msgstr "ファイルシステムを選んでください"
+
+#: modules/01-hd.bm:132
+msgid "Extended 2 filesystem with journal support."
+msgstr ""
+
+#: modules/01-hd.bm:133
+msgid "Young filesystem developed by SuSE."
+msgstr ""
+
+#: modules/00-hd-tools.bm:80
+msgid "model unknown"
+msgstr "不明なモデル"
+
+#: modules/00-hd-tools.bm:91
+msgid ""
+"The following swap-partitions are marked as swap, but are not yet formatted. "
+"Check those you want to format. Warning, you'll loose all data on the "
+"partition."
+msgstr ""
+
+#: modules/00-hd-tools.bm:146
+msgid "Partitioning harddisk for Berry Linux"
+msgstr ""
+
+#: modules/00-hd-tools.bm:149
+msgid ""
+"Here you must choose one of the available disks \\n and partition it for "
+"Berry Linux."
+msgstr ""
+
+#: modules/00-hd-tools.bm:149
+msgid "Choose one disk"
+msgstr "ディスクを選んでください"
+
+#: modules/00-hd-tools.bm:180
+msgid "Berry Installer Partition-Menu"
+msgstr "パーティションメニュー"
+
+#: modules/00-hd-tools.bm:181
+msgid "Here you can partition your hard disk"
+msgstr ""
+
+#: modules/00-setuser.bm:5
+msgid "Changing user in Passwd/Shadow..."
+msgstr "パスワード情報を更新しています..."
+
+#: modules/00-setuser.bm:24
+msgid "Setting passwords ..."
+msgstr "パスワードを設定しています..."
+
+#: modules/00-setuser.bm:31
+msgid "Updating group ..."
+msgstr "グループを更新しています..."
+
+#: modules/00-dialog.bm:18
+msgid "Fatal security error."
+msgstr "致命的なセキュリティーエラー"
+
+#: modules/00-dialog.bm:64
+msgid "Previous"
+msgstr "前へ"
+
+#: modules/00-dialog.bm:64
+msgid "Next"
+msgstr "次へ"
+
+#: modules/00-dialog.bm:64
+msgid "Help"
+msgstr "ヘルプ"

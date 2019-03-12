@@ -1,0 +1,1269 @@
+#!/bin/bash
+#
+#
+# berry-installer installs and sets up Berry Linux LiveCD on hard disk in KDE
+# All required software for running the installer is on the LiveCD
+#
+# Copyright (C) 2004  jet_blackz@lycos.com
+#
+# This file is part of berry-installer.
+#
+# berry-installer is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# berry-installer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with berry-installer; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+# Disclaimer: The author assumes no liabilities shall any hardware or
+# software damages arise due to the use or misuse of any part of the script.
+#
+# The disclaimer is subject to changes without notice.
+#
+#
+
+
+
+# check for Berry LiveCD or installed Berry system information
+
+checkSystemInfo()
+{
+(df | grep -q $LIVE_CD) && liveCDOK="t" || liveCDOK="f"
+(grep -q $RELEASE $mountPoint/etc/berry-release &> /dev/null) && \
+releaseOK="t" || releaseOK="f"
+return
+}
+
+
+
+# show a warning and exit program if the user is not root
+
+checkUser()
+{
+local user="$(whoami)"
+
+if [ $user != "root" ]; then
+  kdialog --caption "" --title "Berry Installer" --error "\
+You must be root to run the installer\n\
+Click K menu > Run Command..., enter 'kdesu berry-installer' \
+and enter root password"
+  exit
+fi
+return
+}
+
+
+
+# show a about box
+
+showAbout()
+{
+kdialog --caption "" --title "About Berry Installer" --msgbox "\
+Berry Linux\n\
+Copyright  2002-2004 Yuichiro Nakada\n\
+Berry Linux Installer Version 0.46.5 Beta\n\
+Copyright  2004 jet_blackz@lycos.com"
+return
+}
+
+
+
+# show license, and exit installer only if the user declines the license
+
+showLicense()
+{
+kdialog --caption "" --title "GNU General Public License Version 2" \
+--yesno "This program is free software; you can redistribute it and/or \
+modify it under the terms of the GNU General Public License \
+version 2 as published by the Free Software Foundation.\n\
+This program is distributed in the hope that it will be useful, \
+but WITHOUT ANY WARRANTY; without even the implied warranty of \
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the \
+GNU General Public License for more details.\n\
+Do you accept the software license agreement?"
+
+[ $? -eq 1 ] && exit 1
+return
+}
+
+
+
+# ask the user to install Berry or set up installed Berry
+
+showMainMenu()
+{
+exitMainLoop="f"
+while [ $exitMainLoop = "f" ]
+do
+# reset default mount point and Linux and swap partitions
+
+mountPoint="/mnt/berry"
+linuxPartition=
+swapPartition=
+
+setupMethod="$(kdialog --caption "" --title "Welcome to Berry Linux Installer" \
+--menu "Highlight an item in the list, and click [OK] to proceed" \
+install "Install a fresh copy of Berry" \
+setup "Set up Berry installed on hard disk" \
+exit "Exit Berry Linux Installer")"
+
+if [ $? -eq 0 ]; then
+  [ $setupMethod = "install" ] && installBerry
+  [ $setupMethod = "setup" ] && showSubMenu
+  [ $setupMethod = "exit" ] && exitMainLoop="t"
+else
+  setupMethod="none"
+  exitMainLoop="t"
+fi
+done
+return
+}
+
+
+
+# install Berry
+
+installBerry()
+{
+checkSystemInfo
+
+if [ $liveCDOK = "t" ]; then
+  kdialog --caption "" --title "Berry Installer" --error \
+"Boot Berry Linux LiveCD before installing Berry"
+else
+
+  formatPartition
+
+  if [ $executeOK = "t" ]; then
+    copyBerry
+
+    if [ $executeOK = "t" ]; then
+      selectConsoleLanguage
+      selectConsoleKeyboardMapping
+      selectXKeyboardModel
+      selectXKeyboardLayout
+      selectXMouseModel
+      selectXColorDepth
+      adjustXScreen
+      selectNetworkModule
+      secureBerry
+      setPasswords
+      installFileSystemTable
+      installLInuxLOader
+      exitMainLoop="t"
+    else
+      kdialog --caption "" --title "Install Berry" --error \
+"Berry install failed"
+    fi
+  fi
+fi
+return
+}
+
+
+
+# set up installed Berry
+
+showSetupMenu()
+{
+local exitLoop="f"
+
+while [ $exitLoop = "f" ]
+do
+userInput="$(kdialog --caption "" --title "Welcome to Berry Linux Setup" \
+--menu "Highlight an item and click [OK] to set up Berry" \
+selectConsoleLanguage "Select Console Language" \
+selectConsoleKeyboardMapping "Select Console Keyboard Mapping" \
+selectXKeyboardModel "Select X Keyboard Model" \
+selectXKeyboardLayout "Select X Keyboard Layout" \
+selectXMouseModel "Select X Mouse Model" \
+selectXColorDepth "Select X Color Depth" \
+adjustXScreen "Adjust X Screen" \
+selectNetworkModule "Select Network Module" \
+secureBerry "Secure Berry" \
+setPasswords "Set Passwords" \
+installFileSystemTable "Install FileSystem Table" \
+installLInuxLOader "Install LInux LOader" \
+exit "Exit Berry Linux Setup")"
+
+if [ $? -eq 0 ]; then
+  # call the corresponding function to set up Berry
+
+  case "$userInput" in
+    "selectConsoleLanguage" ) selectConsoleLanguage
+      ;;
+    "selectConsoleKeyboardMapping" ) selectConsoleKeyboardMapping
+      ;;
+    "selectXKeyboardModel" ) selectXKeyboardModel
+      ;;
+    "selectXKeyboardLayout" ) selectXKeyboardLayout
+      ;;
+    "selectXMouseModel" ) selectXMouseModel
+      ;;
+    "selectXColorDepth" ) selectXColorDepth
+      ;;
+    "adjustXScreen" ) adjustXScreen
+      ;;
+    "selectNetworkModule" ) selectNetworkModule
+      ;;
+    "secureBerry" ) secureBerry
+      ;;
+    "setPasswords" ) setPasswords
+      ;;
+    "installFileSystemTable" ) installFileSystemTable
+      ;;
+#    "installLInuxLOader" ) installLInuxLOader
+    "installLInuxLOader" ) install_grub
+      ;;
+    "exit" ) exitLoop="t"
+      ;;
+  esac
+else
+  exitLoop="t"
+fi
+done
+return
+}
+
+
+
+# set Berry up locally or remotely
+
+showSubMenu()
+{
+setupMethod="$(kdialog --caption "" --title "Berry Setup" --menu "\
+You are setting up Berry on\
+" mounted "Mounted partition\
+" unmounted "Unmounted partition")"
+
+if [ $? -eq 0 ]; then
+
+  if [ $setupMethod = "mounted" ]; then
+    setupMounted
+  else
+    setupUnmounted
+  fi
+
+  [ $linuxPartition != "none" ] && showSetupMenu
+fi
+return
+}
+
+
+
+# set up the already mounted and running Berry partition
+
+setupMounted()
+{
+mountPoint=""
+checkSystemInfo
+
+if [ $liveCDOK = "f" ] && [ $releaseOK = "t" ]; then
+  exitLoop="t"
+  linuxPartition="$(grep ext3 /etc/fstab | awk '{print $1}')"
+
+else
+  kdialog --caption "" --title "Berry Setup" --error "
+Boot Berry Linux off hard disk before setting up Berry"
+  linuxPartition="none"
+fi
+return
+}
+
+
+
+# get an existing partition, that fits Berry, from the user
+
+getPartition()
+{
+linuxPartition="none"
+local thisPartition=""
+
+if [ $setupMethod = "install" ]; then
+  # list every available partition between the minimal and maximum sizes
+
+  local partitions=$(awk '/hd.[123456789]$/ { if ($3 >= '$MIN_PARTITION_SIZE') \
+print "/dev/"$4" /dev/"$4".........."int($3/1000000)"GB"}' /proc/partitions)
+else
+  # list the same-sized partitions except the mounted Berry partition
+
+  local partitions=$(awk '/hd[a-z][1-9]/ {while (getline file < "/etc/fstab") \
+{count++; if (count == 2) berry=substr(file,6,4)}}; \
+/hd[a-z][1-9]/ {if ($3 >= '$MIN_PARTITION_SIZE' && $4 != berry) \
+print "/dev/"$4" /dev/"$4".........."int($3/1000000)"GB"}' /proc/partitions)
+fi
+
+if [ $getPartitionMethod = "mount" ]; then
+  thisPartition="$(kdialog --caption "" --title "Mount Partition" --menu \
+"Select a Berry partition to mount" $partitions)"
+else
+  thisPartition="$(kdialog --caption "" --title "Format Partition" --menu \
+"Select a partition to format" $partitions)"
+fi
+
+# return the existing partition that is big enough to fit Berry
+
+if [ $? -eq 0 ]; then
+  linuxPartition=$thisPartition
+fi
+return
+}
+
+
+
+# mount an existing Berry system to set up
+
+setupUnmounted()
+{
+getPartitionMethod="mount"
+getPartition
+
+if [ $linuxPartition != "none" ]; then
+  mount -t ext3 $linuxPartition $mountPoint &> /dev/null || \
+  linuxPartition="none"
+
+  if [ $linuxPartition = "none" ]; then
+    kdialog --caption "" --title "Berry Setup" --sorry "\
+The partition $linuxPartition could not be mounted"
+
+  else
+    checkSystemInfo
+
+    if [ $releaseOK = "f" ]; then
+      umount $mountPoint &> /dev/null
+      kdialog --caption "" --title "Berry Setup" --sorry "\
+Berry Linux could not be found on $linuxPartition"
+      linuxPartition="none"
+    fi
+  fi
+fi
+return
+}
+
+
+
+# partition a user-selected hard disk
+
+partitionHardDisk()
+{
+local harddisks=$(cat /proc/partitions | sed -n '/[a-z]$/p' | \
+awk '{print "/dev/"$4" /dev/"$4"......"int($3/1000000)"GB "}' | \
+grep -v "name")
+
+harddisk="$(kdialog --caption "" --title "Partition Hard Disk" --menu \
+"Select a hard disk to partition" $harddisks)"
+
+if [ $? -eq 0 ]; then
+
+  # show a dialog of partitioning instructions
+
+  kdialog --caption "" --title "Partition Hard Disk" --msgbox "\
+In fdisk, you enter m for help,\n\
+enter n to add a new partition,\n\
+enter t to change the partition type,\n\
+enter w to write the partition table to disk and quit.\n\
+You will create a 2.5 GB or larger type 83 Linux partition,\n\
+and a 512 MB or smaller type 82 swap partition."
+
+  # partition the selected hard disk
+
+  konsole -e fdisk $harddisk && exitLoop="t"
+
+  if [ $exitLoop = "f" ]; then
+  kdialog --caption "" --title "Partition Hard Disk" --sorry "\
+The hard disk could not be partitioned"
+  fi
+fi
+return
+}
+
+
+
+# format a partition as EXT3 for installing Berry
+
+formatPartition()
+{
+executeOK="f"
+getPartitionMethod="format"
+getPartition
+
+if [ $linuxPartition = "none" ]; then
+  kdialog --caption "" --title "Format Partition" --error \
+"Berry could not be installed without a formatted partition"
+
+else
+  # format the partition as EXT3
+
+  mkfs.ext3 -i 4096 $linuxPartition &> /dev/null && executeOK="t"
+
+  if [ $executeOK = "t" ]; then
+    # reset the number of time the partition has been mounted to 1
+    # adjust the interval between forced checks to once 1 month
+    # and set the last checked time to present time
+
+    local dateTime=$(date +%Y%m%d%H%M%S)
+    tune2fs -C 1 -i 1m -T $dateTime $linuxPartition &> /dev/null
+  else
+    kdialog --caption "" --title "Format Partition" --sorry "\
+The partition $linuxPartition could not be formatted"
+  fi
+fi
+return
+}
+
+
+
+# install Berry on the formatted partition
+
+copyBerry()
+{
+executeOK="f"
+kdialog --caption "" --title "Install Berry" --msgbox \
+"Berry Linux is going to be installed on $linuxPartition"
+
+if [ $? -eq 0 ]; then
+
+  # blank the screen, instead of burning in the monitor
+  sleep 2
+  xset s blank s activate &> /dev/null
+
+  # install Berry on hard disk
+
+  mount -t ext3 $linuxPartition $mountPoint &> /dev/null && executeOK="t"
+
+  if [ $executeOK = "t" ]; then
+    cp -a /BERRY/* $mountPoint/ &> /dev/null && executeOK="t"
+
+    if [ $executeOK = "t" ]; then
+      cp -a /dev/* $mountPoint/dev/ &> /dev/null && executeOK="t"
+      cp -f /etc/X11/$XF86CONFIG $mountPoint/etc/X11/ &> /dev/null
+      cp -f /BERRY$XINIT_DIR/xinput $mountPoint$XINIT_DIR/ &> /dev/null
+      echo "mount /mnt/floppy" >> $mountPoint/etc/rc.d/rc.sysinit 2> /dev/null
+    fi
+  fi
+
+  # wake up the monitor, and reset the screen saver
+
+  xset s blank s off &> /dev/null
+  xset s blank s 300 &> /dev/null
+
+else
+  kdialog --caption "" --title "Install Berry" --error "\
+Berry install was cancelled"
+fi
+return
+}
+
+
+
+# append POSIX locale environment variables to /etc/profile
+
+makeLocale()
+{
+cat << EOF >> profile
+export LANG=$locale
+export LANGUAGE=$locale
+export LC_ALL=$locale
+export LC_COLLATE=$locale
+export LC_CTYPE=$locale
+export LC_MESSAGES=$locale
+EOF
+return
+}
+
+
+
+# set up a non-Japanese system
+
+setForeignSystem()
+{
+cd $mountPoint/etc/
+
+if [ -f profile.$BACKUP ]; then
+  cp -f profile.$BACKUP profile &> /dev/null
+else
+  cp -f profile profile.$BACKUP &> /dev/null
+fi
+
+makeLocale
+
+# disable Japanese manpages
+
+if [ -f man.config.$BACKUP ]; then
+  cp -f man.config.$BACKUP man.config &> /dev/null
+else
+  cp -f man.config man.config.$BACKUP &> /dev/null
+fi
+
+sed 's/JNROFF/#JNROFF/' man.config > temp
+mv -f temp man.config &> /dev/null
+
+# disable kinput2
+
+cd $mountPoint/etc/sysconfig/
+
+if [ -f i18n.$BACKUP ]; then
+  cp -f i18n.$BACKUP i18n &> /dev/null
+else
+  mv -f i18n i18n.$BACKUP &> /dev/null
+fi
+
+echo LANG=\"$locale\" > i18n
+cd $mountPoint$XINIT_DIR/ &> /dev/null
+
+if [ -f xinput.$BACKUP ]; then
+  cp -f xinput.$BACKUP xinput &> /dev/null
+else
+  cp -f xinput xinput.$BACKUP &> /dev/null
+fi
+
+sed 's/case $tmplang in/case $tmplang1 in/' xinput > temp
+mv -f temp xinput &> /dev/null
+return
+}
+
+
+
+# ask the user for the console POSIX locale
+
+selectConsoleLanguage()
+{
+local locales="$(locale -a | awk '/^[a-z][a-z]_[A-Z][A-Z]$/' | sort -f)"
+local exitLoop="f"
+
+while [ $exitLoop = "f" ]
+do
+locale="$(kdialog --caption "" --title "Select Console Language" --menu \
+"Select your console language (i.e. en_US for U.S. English)" $locales)"
+
+if [ $? -eq 0 ]; then
+  exitLoop="t"
+
+  if [ "$locale" != "ja_JP" ]; then
+    # call function to set up a non-Japanese system
+    # By the way, Berry is from Japan. Any other language is foreign
+
+    setForeignSystem
+
+  else
+    # set up a Japanese system by reverting to the original files
+    # work if the files are backed up by this installer
+
+    cd $mountPoint/etc/ &> /dev/null
+    [ -f profile.$BACKUP ] && cp -f profile.$BACKUP profile &> /dev/null
+    makeLocale
+    [ -f man.config.$BACKUP ] && \
+    cp -f man.config.$BACKUP man.config &> /dev/null
+    cd $mountPoint/etc/sysconfig/ &> /dev/null
+    [ -f i18n.$BACKUP ] && cp -f i18n.$BACKUP i18n &> /dev/null
+    cd $mountPoint$XINIT_DIR/ &> /dev/null
+    [ -f xinput.$BACKUP ] && cp -f xinput.$BACKUP xinput &> /dev/null
+  fi
+
+  cd $HOME_DIR &> /dev/null
+fi
+done
+return
+}
+
+
+
+# ask the user for the console keyboard mapping
+
+selectConsoleKeyboardMapping()
+{
+local keyMaps="$(ls /lib/kbd/keymaps/i386/qwerty/ | sed 's/.map.gz//g' | \
+awk '{ print $1" "$1 }' | sort -f)"
+local exitLoop="f"
+
+while [ $exitLoop = "f" ]
+do
+keyMap="$(kdialog --caption "" --title "Select Keyboard Mapping" --menu \
+"Select your keyboard mapping (i.e. us for U.S. English)" $keyMaps)"
+
+# replace the existing keyboard mapping with a new one in keyboard
+
+if [ $? -eq 0 ]; then
+  exitLoop="t"
+  cd $mountPoint/etc/sysconfig &> /dev/null
+
+  if [ -f keyboard.$BACKUP ]; then
+    cp -f keyboard.$BACKUP keyboard &> /dev/null
+  else
+    cp -f keyboard keyboard.$BACKUP &> /dev/null
+  fi
+
+  sed "s/jp106/$keyMap/" keyboard > temp
+  mv temp keyboard &> /dev/null
+  cd $HOME_DIR &> /dev/null
+fi
+done
+return
+}
+
+
+
+# ask the user for the X Window keyboard model
+
+selectXKeyboardModel()
+{
+if [ $XKB_LIST = "/etc/X11/xkb/rules/xfree86.lst" ]; then
+  local keyModels="$(sed -n '10,99p' $XKB_LIST | awk '{ print $1" "$1 }' \
+| sort -f)"
+else
+  local keyModels="$(sed -n '10,102p' $XKB_LIST | awk '{ print $1" "$1 }' \
+| sort -f)"
+fi
+local exitLoop="f"
+
+while [ $exitLoop = "f" ]
+do
+XkbModel="$(kdialog --caption "" --title "Select Keyboard Model" --menu \
+"Select your keyboard model (i.e. pc104 for 104-key PC keyboard)" $keyModels)"
+
+# replace the existing keyboard model with a new one in $XF86CONFIG
+
+if [ $? -eq 0 ]; then
+  exitLoop="t"
+  cd $mountPoint/etc/X11/ &> /dev/null
+
+  if [ -f $XF86CONFIG.$BACKUP ]; then
+    cp -f $XF86CONFIG.$BACKUP $XF86CONFIG &> /dev/null
+  else
+    cp -f $XF86CONFIG $XF86CONFIG.$BACKUP &> /dev/null
+  fi
+
+  sed -n '/XkbModel/p' $XF86CONFIG | grep -v "#" > temp
+  local oldXkbModel="$(awk '{print $3}' temp)"
+  sed "/$oldXkbModel/s//\"$XkbModel\"/" temp > temp2
+  oldXkbModel="$(cat temp)"
+  XkbModel="$(cat temp2)"
+  sed "/$oldXkbModel/s//$XkbModel/" $XF86CONFIG > temp
+  rm -f $XF86CONFIG temp2 &> /dev/null
+  mv -f temp $XF86CONFIG &> /dev/null
+  cd $HOME_DIR &> /dev/null
+fi
+done
+return
+}
+
+
+
+# ask the user for the X Window keyboard layout
+
+selectXKeyboardLayout()
+{
+if [ $XKB_LIST = "/etc/X11/xkb/rules/xfree86.lst" ]; then
+  local keyLayouts="$(sed -n '108,193p' $XKB_LIST | awk '{ print $1" "$1 }' \
+| sort -f)"
+else
+  local keyLayouts="$(sed -n '111,200p' $XKB_LIST | awk '{ print $1" "$1 }' \
+| sort -f)"
+fi
+local exitLoop="f"
+
+while [ $exitLoop = "f" ]
+do
+kbLayout="$(kdialog --caption "" --title "Select Keyboard Layout" --menu \
+"Select your keyboard layout (i.e. us for U.S. English)" $keyLayouts)"
+
+# replace the existing keyboard layout with a new one in $XF86CONFIG
+
+if [ $? -eq 0 ]; then
+  exitLoop="t"
+  cd $mountPoint/etc/X11/ &> /dev/null
+  sed -n '/XkbLayout/p' $XF86CONFIG | grep -v "#" > temp
+  local oldkbLayout="$(awk '{print $3}' temp)"
+  sed "/$oldkbLayout/s//\"$kbLayout\"/" temp > temp2
+  oldkbLayout="$(cat temp)"
+  kbLayout="$(cat temp2)"
+  sed "/$oldkbLayout/s//$kbLayout/" $XF86CONFIG > temp
+  rm -f $XF86CONFIG temp2 &> /dev/null
+  mv -f temp $XF86CONFIG &> /dev/null
+  cd $HOME_DIR &> /dev/null
+fi
+done
+return
+}
+
+
+
+# add mouse module to rc.local for loading it at boot
+
+addMouseModule()
+{
+# add PS/2 mouse module to start-up script if needed
+
+cd $mountPoint/etc/rc.d/ &> /dev/null
+
+if (echo $mouseModel | grep -q "PS\\\/2"); then
+  if !(grep -q psmouse rc.local); then
+    echo "modprobe psmouse" >> rc.local 2> /dev/null
+  fi
+
+# add USB mouse module to start-up script if needed
+
+elif (echo $mouseModel | grep -q "usb"); then
+  if !(grep -q usbmouse rc.local); then
+    echo "modprobe usbmouse" >> rc.local 2> /dev/null
+  fi
+
+elif (echo $mouseModel | grep -q "Auto"); then
+  if !(grep -q usbmouse rc.local); then
+    echo "modprobe usbmouse" >> rc.local 2> /dev/null
+  fi
+fi
+return
+}
+
+
+
+# ask the user for the mouse model for X Window
+
+selectXMouseModel()
+{
+mouseModel="$(kdialog --caption "" --title "Select Mouse Model" --menu "\
+Select your mouse model (i.e. PS/2 for generic PS/2 mouse)" \
+"Auto" "Auto - Generic serial, PS/2 or USB mouse" \
+"ExplorerPS\/2" "ExplorerPS/2 - IntelliMouse Explorer on PS/2" \
+"GlidePoint" "GlidePoint - GlidePoint on serial" \
+"GlidePointPS\/2" "GlidePointPS/2 - GlidePoint on PS/2" \
+"IMPS\/2" "IMPS/2 - IntelliMouse, Wheel Mouse Optical, Logitech Cordless on PS/2" \
+"IntelliMouse" "IntelliMouse - IntelliMouse" \
+"MouseManPlusPS\/2" "MouseManPlusPS/2 - MouseMan+ on PS/2" \
+"NetMousePS\/2" "NetMousePS/2 - MieMouse, NetMouse and NetMouse Pro on PS/2" \
+"NetScrollPS\/2" "NetScrollPS/2 - NetScroll on PS/2" \
+"PS\/2" "PS/2 - Generic PS/2 mouse" \
+"ThinkingMouse" "ThinkingMouse - Thinking Mouse or Expert Mouse on serial" \
+"ThinkingMousePS\/2" "ThinkingMousePS/2 - Thinking Mouse or Expert Mouse on PS/2" \
+"usb" "usb - USB mouse")"
+
+if [ $? -eq 0 ]; then
+  # call function to add mouse module
+
+  addMouseModule
+  cd $mountPoint/etc/X11/ &> /dev/null
+  sed -n '/Option.*"Protocol"/p' $XF86CONFIG | grep -v "#" > temp
+  local oldMouseModel=""
+  local newMouseModel=""
+  local length=$(wc -l temp | awk '{print $1}')
+
+  # iterate through mouse protocols and replace them with the selected one
+
+  while [ $length -gt 0 ]
+  do
+    awk 'NR == '$length'' temp > temp2
+    oldMouseModel="$(awk '{print $3}' temp2 | sed 's/\"//g; s/\//\\\//g')"
+    sed "/$oldMouseModel/s//$mouseModel/" temp2 > temp3
+    oldMouseModel="$(cat temp2 | sed 's/\//\\\//g')"
+    newMouseModel="$(cat temp3 | sed 's/\//\\\//g')"
+    sed "/$oldMouseModel/s//$newMouseModel/" $XF86CONFIG > temp4
+    mv -f temp4 $XF86CONFIG &> /dev/null
+    let "length-=1"
+  done
+  rm -f temp temp2 temp3 &> /dev/null
+  cd $HOME_DIR &> /dev/null
+fi
+return
+}
+
+
+
+# ask the user for the default X Window Color Depth
+
+selectXColorDepth()
+{
+local exitLoop="f"
+
+while [ $exitLoop = "f" ]
+do
+newXColorDepth="$(kdialog --caption "" --title "Select X Window Color Depth" \
+--menu "Select the default color depth (i.e. 24 for 24-bit 16 million colors)" \
+1 "1" 4 "4" 8 "8" 15 "15" 16 "16" 24 "24" 32 "32")"
+
+if [ $? -eq 0 ]; then
+
+  # replace existing color depth with the new one
+
+  exitLoop="t"
+  cd $mountPoint/etc/X11/ &> /dev/null
+  sed -n "/DefaultColorDepth/p" $XF86CONFIG > temp
+  local oldXColorDepthLine="$(awk 'NR == 1' temp)"
+  local oldXColorDepth="$(awk '{print $2}' temp)"
+  sed "s/$oldXColorDepth/$newXColorDepth/" temp > temp2
+  local newXColorDepthLine="$(awk 'NR == 1' temp2)"
+  sed "s/$oldXColorDepthLine/$newXColorDepthLine/" $XF86CONFIG > temp
+  rm -f temp2 $XF86CONFIG &> /dev/null
+  mv -f temp $XF86CONFIG &> /dev/null
+  cd $HOME_DIR &> /dev/null
+fi
+done
+return
+}
+
+
+
+# ask the user to adjust the screen position and size
+
+adjustXScreen()
+{
+# show a dialog of video tuning instructions
+
+kdialog --caption "" --title "Adjust X Window Screen" --msgbox "\
+In X video mode tuner, adjust the screen position and size\n\
+then click [Apply], [Show] and [Quit].\n\
+Or just click [Quit] in X video mode tuner\n\
+if there is no need to adjust the screen."
+
+# run xvidtune and direct output to temp file
+
+cd $mountPoint/etc/X11/ &> /dev/null
+xvidtune > temp
+
+# replace the first occurence of matching mode lines with the selected one
+
+if [ $(awk 'END { print NR }' temp) = "6" ]; then
+  local newModeLine="ModeLine $(awk 'NR == 5' temp)"
+  echo $newModeLine > temp
+  local resolution="ModeLine $(awk '{print $2}' temp)"
+
+  # list any mode line matching the current resolution
+
+  sed -n "/$resolution/p" $XF86CONFIG > temp
+  local oldModeLine="$(awk 'NR == 1' temp)"
+  sed "s/$oldModeLine/\t$newModeLine/" $XF86CONFIG > temp
+  rm -f $XF86CONFIG &> /dev/null
+  mv -f temp $XF86CONFIG &> /dev/null
+fi
+
+cd $HOME_DIR &> /dev/null
+return
+}
+
+
+
+# ask the user for the network module
+
+selectNetworkModule()
+{
+local networkModules="$(ls /lib/modules/$(uname -r)/kernel/drivers/net/ | \
+sed 's/.ko$//; s/.o$//' | awk '{ print $1" "$1 }' | sort -f)"
+
+networkModule="$(kdialog --caption "" --title "Select Network Module" --menu \
+"Select your network driver (i.e. forcedeth for n-Force motherboard)" \
+$networkModules)"
+
+# add the network module to system initialization script
+
+if [ $? -eq 0 ]; then
+  cd $mountPoint/etc/rc.d/ &> /dev/null
+
+  if (! grep -q $networkModule rc.local); then
+    echo "modprobe $networkModule" >> rc.local 2> /dev/null
+  fi
+  cd $HOME_DIR &> /dev/null
+fi
+return
+}
+
+
+
+# disable all services by default
+
+disableAllServices()
+{
+cd $mountPoint/etc/init.d/ &> /dev/null
+chmod -x gpm messagebus netfs pcmcia portmap saslauthd sshd whiz xfs xinetd \
+&> /dev/null
+
+# disable ssh-agent
+
+cd $mountPoint/usr/bin/ &> /dev/null
+[ -f ssh-agent ] && mv -f ssh-agent ssh-agent.$BACKUP &> /dev/null
+
+# disable remote X login
+
+cd $mountPoint/etc/X11/xdm/ &> /dev/null
+mv -f Xservers Xservers.$BACKUP &> /dev/null
+echo ":0 local /usr/X11R6/bin/X -nolisten tcp" > Xservers 2> /dev/null
+return
+}
+
+
+
+# secure Berry by disabling unnecessary services
+
+secureBerry()
+{
+kdialog --caption "" --title "Secure Berry" --separate-output --checklist \
+"Select a service to enable or unselect it to disable" \
+gpm "gpm - Console Cut-and-Paste Utility" off \
+messagebus "messagebus - D-BUS System-wide Message Bus" off \
+netfs "netfs - Network Filesystem" off \
+pcmcia "pcmcia - Laptop PC Card Support" off \
+portmap "portmap - RPC Port Mapper" off \
+saslauthd "saslauthd - Simple Authentication Security Layer Daemon" off \
+ssh-agent "ssh-agent - Secure Shell Authentication Agent" off \
+sshd "sshd - Secure Shell Daemon" off \
+whiz "whiz - Kana-Kanji Conversion Engine" off \
+xfs "xfs - X Font Server" off \
+xinetd "xinetd - Extended Internet Services Daemon" off \
+6000 "Remote X Login" off > $HOME_DIR/temp
+
+if [ $? -eq 0 ]; then
+  local length=$(wc -l $HOME_DIR/temp | awk '{print $1}')
+
+  # call function to disable all service
+
+  disableAllServices
+
+  # iterate through selected services and enable them
+
+  while [ $length -gt 0 ]
+  do
+    local service="$(awk 'NR == '$length'' $HOME_DIR/temp)"
+    let "length-=1"
+
+    # enable ssh-agent
+
+    if [ $service = "ssh-agent" ]; then
+      cd $mountPoint/usr/bin/ &> /dev/null
+      [ -f ssh-agent.$BACKUP ] && cp -f ssh-agent.$BACKUP ssh-agent &> /dev/null
+
+    # enable remote X login
+
+    elif [ $service = "6000" ]; then
+      echo ":0 local /usr/X11R6/bin/X" > $mountPoint/etc/X11/xdm/Xservers \
+      2> /dev/null
+
+    # enable the selected service
+
+    else
+      chmod +x $mountPoint/etc/init.d/$service &> /dev/null
+    fi
+  done
+fi
+
+cd $HOME_DIR &> /dev/null
+rm -f temp &> /dev/null
+return
+}
+
+
+
+# set root and user passwords
+
+setPasswords()
+{
+password=$(kdialog --caption "" --title "Set root Password" --password "\
+Enter a root password (default is root)")
+[ -z $password ] && password="root"
+cd $mountPoint/etc/ &> /dev/null
+rm -f group.lock gshadow.lock passwd.lock shadow.lock &> /dev/null
+cd $HOME_DIR &> /dev/null
+
+# write root password
+
+if [ $setupMethod = "mounted" ]; then
+  /bin/echo root:$password | /usr/sbin/chpasswd
+else
+  chroot $mountPoint /bin/bash -c "/bin/echo root:$password | /usr/sbin/chpasswd"
+fi
+
+password=$(kdialog --caption "" --title "Set User Password" --password "\
+Enter a berry user password (default is berry)")
+[ -z $password ] && password="berry"
+
+# write user password
+
+if [ $setupMethod = "mounted" ]; then
+  /bin/echo berry:$password | /usr/sbin/chpasswd
+else
+  chroot $mountPoint /bin/bash -c "/bin/echo berry:$password | /usr/sbin/chpasswd"
+fi
+return
+}
+
+
+
+# make a generic File System Table
+
+makeFileSystemTable()
+{
+cat << EOF > $mountPoint/etc/fstab
+#file system       mount point type    options          dump pass
+$linuxPartition          /           ext3    defaults         1 1
+$swapPartition          swap        swap    defaults         0 0
+/dev/cdroms/cdrom0 /mnt/cdrom  iso9660 noauto,user,exec 0 0
+/dev/cdroms/cdrom0 /mnt/dvdrom udf     noauto,user,exec 0 0
+/dev/fd0           /mnt/floppy auto    noauto,user,rw   0 0
+none               /proc       proc    defaults         0 0
+none               /dev/pts    devpts  defaults         0 0
+tmpfs              /dev/shm    tmpfs   defaults         0 0
+EOF
+
+# correct File System Table permissions
+
+chmod 0644 $mountPoint/etc/fstab &> /dev/null
+
+# make CD-ROM, DVD-ROM and floppy mount points if missing
+
+cd $mountPoint/mnt &> /dev/null
+[ ! -d cdrom ] && mkdir cdrom &> /dev/null
+[ ! -d dvdrom ] && mkdir dvdrom &> /dev/null
+[ ! -d floppy ] && mkdir floppy &> /dev/null
+cd $HOME_DIR &> /dev/null
+return
+}
+
+
+
+# install File System Table with an optional swap partition
+
+installFileSystemTable()
+{
+local partitions=$(awk '/hd.[123456789]$/ {if ($3 >= '$MIN_SWAP_SIZE' && \
+$3 <= '$MAX_SWAP_SIZE') print "/dev/"$4" /dev/"$4}' /proc/partitions)
+
+swapPartition="$(kdialog --caption "" --title "Install FileSystem Table" \
+--menu "Select a partition to format as swap or click Cancel for no swap" \
+$partitions)"
+
+if [ $? -eq 0 ]; then
+  if [ $swapPartition = $linuxPartition ]; then
+    kdialog --caption "" --title "Install FileSystem Table" --sorry "\
+Berry and swap partitions cannot be the same"
+
+  else
+    # make /etc/fstab, add a swap partition to it
+    # format swap if it isn't a setup for a mounted Berry
+
+    makeFileSystemTable
+    [ $setupMethod != "mounted" ] && mkswap $swapPartition &> /dev/null
+  fi
+
+else
+
+  # make /etc/fstab without a swap partition
+
+  swapPartition="#/dev/swap"
+  makeFileSystemTable
+fi
+return
+}
+
+
+
+# make a generic LInux LOader configuration file
+
+makeLILOconf()
+{
+cat << EOF > $mountPoint/etc/lilo.conf
+boot=$device
+lba32
+image=/boot/vmlinuz
+label=Berry
+root=$linuxPartition
+initrd=/boot/initrd.gz
+read-only
+append="devfs=mount"
+EOF
+
+# make it read and write for only root
+
+chmod 0600 $mountPoint/etc/lilo.conf &> /dev/null
+return
+}
+
+
+
+# install LInux LOader on a user-defined device
+
+installLInuxLOader()
+{
+device="$(kdialog --caption "" --title "Install LInux LOader" --menu "\
+Select a device to install LInux LOader\
+" mbr "Master boot record" root "Root sector of Berry partition")"
+
+if [ $? -eq 0 ]; then
+
+  # determines boot and root device
+
+  if [ $device = "mbr" ]; then
+    device=$harddisk
+  else
+    device=$linuxPartition
+  fi
+
+  makeLILOconf
+
+  # chroot into Berry partition, write LILO
+
+  if [ $setupMethod = "mounted" ]; then
+    /sbin/lilo -v &> /dev/null
+  else
+    chroot $mountPoint /sbin/lilo -v &> /dev/null
+  fi
+fi
+return
+}
+
+
+
+# make a generic grub configuration file
+
+make_grubconf()
+{
+cat << EOF > $mountPoint/boot/grub/grub.conf
+#
+# Boot Menu Configuration
+#
+
+default 0
+timeout 5
+splashimage=/boot/grub/splash.xpm.gz
+
+# For booting Linux
+title  Berry Linux
+kernel /boot/vmlinuz vga=791 quiet init=/sbin/initng-is
+initrd /boot/initrd.gz
+
+title  Berry Linux for CD-ROM
+kernel /boot/vmlinuz ro boot=cdrom vga=791 splash=silent
+initrd /boot/initrd.gz
+EOF
+
+# make it read and write for only root
+
+chmod 0600 $mountPoint/boot/grub/grub.conf &> /dev/null
+return
+}
+
+
+
+# install grub on a user-defined device
+
+install_grub()
+{
+device="$(kdialog --caption "" --title "Install grub" --menu "\
+Select a device to install grub\
+" mbr "Master boot record" root "Root sector of Berry partition")"
+
+if [ $? -eq 0 ]; then
+
+  # determines boot and root device
+
+  if [ $device = "mbr" ]; then
+    device=$harddisk
+  else
+    device=$linuxPartition
+  fi
+
+  make_grubconf
+
+  # chroot into Berry partition, write grub
+
+  case "${linuxPartition:7:1}" in a) GHD=0; ;; b) GHD=1; ;; c) GHD=2; ;; d) GHD=3; ;; esac
+  HD_PART="($GHD,$((${linuxPartition:8:1} -1))"")"
+  if [ $device = "mbr" ]; then
+    device=$harddisk
+    HD_INST="(hd0)"
+  else
+    device=$linuxPartition
+    HD_INST=$HD_PART
+  fi
+
+  if [ $setupMethod = "mounted" ]; then
+grub --batch << EOM
+root ${HD_PART}
+setup ${HD_INST}
+quit
+EOM
+  else
+grub --batch << EOM
+root ${HD_PART}
+install /boot/grub/stage1 ${HD_INST} /boot/grub/stage2 p /boot/grub/grub.conf
+quit
+EOM
+  fi
+fi
+return
+}
+
+
+
+# unmount Berry mount point, and delete it
+
+unmountPartition()
+{
+if (df | grep -q $mountPoint); then
+  umount $mountPoint &> /dev/null
+  rm -fr $mountPoint &> /dev/null
+fi
+return
+}
+
+
+
+# release info, LiveCD info, backup file extention, default home directory
+# default mount point, minimum partition size, minimum and maximum swap
+# partition sizes
+
+RELEASE="Berry"
+LIVE_CD='/dev/cloop/0'
+BACKUP="old"
+HOME_DIR="/home/berry"
+mountPoint="/mnt/berry"
+MIN_PARTITION_SIZE=1600000
+MIN_SWAP_SIZE=32000
+MAX_SWAP_SIZE=1100000
+
+# ensure compatibility with XFree86 and X.Org
+
+XKB_LIST="/etc/X11/xkb/rules/xfree86.lst"
+[ -f $XKB_LIST ] || XKB_LIST="/etc/X11/xkb/rules/xorg.lst"
+XINIT_DIR="/etc/X11/xinit/xinitrc.d"
+XF86CONFIG="xorg.conf"
+#XF86CONFIG="XF86Config-4"
+[ -f /etc/X11/$XF86CONFIG ] || XF86CONFIG="XF86Config"
+
+# verify user id
+
+checkUser
+showAbout
+showLicense
+
+# do housekeeping
+
+cd $HOME_DIR
+[ -d $mountPoint/lost+found/ ] && umount $mountPoint
+[ ! -d $mountPoint/ ] && mkdir $mountPoint
+
+# blank screen after 5 minutes of keyboard and mouse inactivity
+
+xset s blank s 300
+
+# call functions to show main menu and unmount partition
+
+showMainMenu
+unmountPartition
+
+# ask the user to reboot computer
+
+if [ $setupMethod = "install" ]; then
+  kdialog --caption "" --title "Berry Installer" --yesno "\
+Berry install was successful.\n\
+Do you want to reboot the computer?"
+  [ $? -eq 0 ] && reboot
+
+else
+  kdialog --caption "" --title "Berry Installer" --msgbox "\
+Thank you for using Berry Linux Installer"
+fi

@@ -1,0 +1,224 @@
+#!/bin/bash
+
+# Find changes in (real) files of dir1 ... dir2
+# function taken from saveconfig
+system_findchanged()
+{
+if [ -d "$1" ]; then
+for i in $( cd "$1"; find . -type f | sed 's,^\./,,g' | grep -v ' ' ); do
+cmp -s "$1/$i" "$2/$i" || echo "$1/$i"
+done
+elif [ -e "$1" ]; then
+cmp -s "$1" "$2" || echo "$1"
+fi
+}
+
+system_copy_etc()
+{
+	update_status $"Copying custom configuration ..."
+
+	# copy changed files in /etc
+	#( cd $TARGET_MNT_POINT; system_findchanged /etc /BERRY/etc | egrep -v "fstab|passwd|shadow|group" | tar -T - -cf - | tar xf -) 2>/dev/null
+
+	# copy skel
+	cp -a $TARGET_MNT_POINT/etc/skel/.[!.]* $TARGET_MNT_POINT/root/
+	cp -a $TARGET_MNT_POINT/etc/skel/* $TARGET_MNT_POINT/root/
+
+	# copy i18n
+	cp -a /etc/sysconfig/i18n $TARGET_MNT_POINT/etc/sysconfig/
+	cp -a /etc/hal/fdi/policy/* $TARGET_MNT_POINT/etc/hal/fdi/policy/
+
+	# install_nvidia_drivers
+	# use berry-generated XF86Config
+	cp -af /etc/X11/XF86Config* $TARGET_MNT_POINT/etc/X11/
+	cp -af /etc/X11/xorg.conf $TARGET_MNT_POINT/etc/X11/
+
+#	# Save ALSA sound volume
+#	[ -e /proc/asound/modules -a -x /usr/sbin/alsactl ] && /usr/sbin/alsactl store
+#	# Copy volume setting
+#	[ -f /var/lib/alsa/asound.state ] && cp /var/lib/alsa/asound.state $TARGET_MNT_POINT/var/lib/alsa
+
+	# for modules
+	[ -f /etc/modprobe.conf ] && cp /etc/modprobe.conf $TARGET_MNT_POINT/etc
+}
+
+system_copy_home()
+{
+	update_status $"Copying home directory ..."
+
+	# copy home directory from running user
+	rm -rf $TARGET_MNT_POINT/home/$DEFAULT_USER
+	cp -a $TARGET_MNT_POINT/etc/skel $TARGET_MNT_POINT/home
+	mv $TARGET_MNT_POINT/home/skel $TARGET_MNT_POINT/home/$USER_NAME
+#	chroot "$TARGET_MNT_POINT" chown -R $USER_NAME.$USER_NAME /home/$USER_NAME
+
+	chroot "$TARGET_MNT_POINT" mount /proc
+	chroot "$TARGET_MNT_POINT" su $USER_NAME -c /opt/berry/mkdiscicons
+	chroot "$TARGET_MNT_POINT" umount /proc
+
+	[ -f "$TARGET_MNT_POINT"/bin/busybox ] && BUSYBOX=/bin/busybox
+	chroot "$TARGET_MNT_POINT" $BUSYBOX chown -R $USER_NAME.$USER_NAME /home/$USER_NAME
+#	cp -a $TARGET_MNT_POINT/home/$USER_NAME/Documents $TARGET_MNT_POINT/root
+#	chown -R root.root $TARGET_MNT_POINT/root
+
+	# Remove autostart scripts
+	#rm -f $TARGET_MNT_POINT/home/$USER_NAME/.kde/Autostart/*.desktop
+}
+
+system_add_hd_autoconfig()
+{
+	echo "SYSTEM_TYPE=$SYSTEM_TYPE" >> $TARGET_MNT_POINT/etc/default/berry
+	echo "SYSTEM_HW_PROFILE=yes" >> $TARGET_MNT_POINT/etc/default/berry
+
+	perl -pi -e 's/ReadOnly=1/ReadOnly=0/g' $TARGET_MNT_POINT/opt/berry/mkdiscicons
+
+	chroot "$TARGET_MNT_POINT" mount /proc
+	chroot "$TARGET_MNT_POINT" su $USER_NAME -c /opt/berry/mkdiscicons
+	chroot "$TARGET_MNT_POINT" umount /proc
+}
+
+system_install_keymap()
+{
+	[ -f /etc/sysconfig/keyboard ] && . /etc/sysconfig/keyboard
+
+	# Add correct keymap
+	[ -n "$KEYTABLE" ] && chroot_it install-keymap "$KEYTABLE"
+}
+
+system_install_i18n()
+{
+	if [ -e "$TARGET_MNT_POINT/etc/sysconfig/i18n" ]
+	then
+		. "$TARGET_MNT_POINT/etc/sysconfig/i18n"
+		cat << EOF >> $TARGET_MNT_POINT/usr/share/config/kdeglobals
+
+[Locale]
+Charset=$CHARSET
+Country=$COUNTRY
+Language=$LANGUAGE
+EOF
+		# Add localisation for kdm
+		# (Language could be commented out)
+		perl -pi -e "s/#Language=.*/Language=$LANGUAGE/g" $TARGET_MNT_POINT/etc/kde/kdm/kdmrc
+		perl -pi -e "s/Language=.*/Language=$LANGUAGE/g" $TARGET_MNT_POINT/etc/kde/kdm/kdmrc
+	else
+		# use Berry Linux generated /etc/sysconfig/i18n file
+		mkdir -p $TARGET_MNT_POINT/etc/sysconfig
+		cp -af /etc/sysconfig/i18n $TARGET_MNT_POINT/etc/sysconfig/
+	fi
+}
+
+# Everything needed for hw-detection
+system_create_modules()
+{
+	# create /etc/modules from current loaded modules
+	cat <<EOF >$TMP
+# /etc/modules: Kernel modules to load at boot time.
+#
+# This file should contain the names of kernel modules that are
+# to be loaded at boot time, one per line.  Comments begin with
+# a '#', and everything on the line after them are ignored.
+
+EOF
+	#cat /proc/modules | tac | grep -v '\[.*\]' | egrep -v "cloop|snd|radeon" |
+	cat /proc/modules | tac | grep -v '\[.*\]' | egrep -v "cloop|mini_fo|radeon|usbhid|usb_storage|pcmcia_core|yenta_socket|_hcd|_agp|unionfs|squashfs" |
+	while read mod x
+	do
+	  if [ $mod = apm ] ; then
+	    echo "apm power_off=1" >>$TMP
+	  else
+	    echo $mod >>$TMP
+	  fi
+	done
+#	cp -f $TMP $TARGET_MNT_POINT/etc/modules
+
+	#chroot "$TARGET_MNT_POINT" chkconfig modutils on
+
+	# Add usb module to start-up script
+	#if grep -q uhci_hcd /proc/modules; then
+	#	echo "alias usb-controller	uhci-hcd" >> $TARGET_MNT_POINT/etc/modprobe.conf
+	#fi
+	#if grep -q ohci_hcd /proc/modules; then
+	#	echo "alias usb-controller	ohci-hcd" >> $TARGET_MNT_POINT/etc/modprobe.conf
+	#fi
+	#if grep -q ehci_hcd /proc/modules; then
+	#	echo "alias usb-controller	ehci-hcd" >> $TARGET_MNT_POINT/etc/modprobe.conf
+	#fi
+
+	# for psmouse
+	#if grep -q psmouse /proc/modules; then
+	##	echo "alias char-major-10-1	psmouse" >> $TARGET_MNT_POINT/etc/modprobe.conf
+	#	echo "modprobe psmouse" >> $TARGET_MNT_POINT/etc/rc.d/rc.local
+	#fi
+
+	## Also save /etc/sysconfig/
+	#mkdir -p $TARGET_MNT_POINT/etc/sysconfig/$(uname -r)
+	#cp -f /etc/sysconfig/{i18n,keyboard,desktop,berry,netcard,mouse,sound,xserver,floppy} $TARGET_MNT_POINT/etc/sysconfig/$(uname -r)/ 2>/dev/null # silence messages
+	#cp -f /etc/X11/XF86Config* $TARGET_MNT_POINT/etc/sysconfig/$(uname -r)/ 2>/dev/null # silence messages
+}
+
+system_update_files()
+{
+	# update /etc/motd
+	echo -e $"Welcome to Berry Linux" "(Kernel $(uname -r))\n" > $TARGET_MNT_POINT/etc/motd
+
+	cat <<EOF >$TARGET_MNT_POINT/etc/hosts
+127.0.0.1	$HOST_NAME localhost
+
+# The following lines are desirable for IPv6 capable hosts
+# (added automatically by netbase upgrade)
+
+::1     ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+ff02::3 ip6-allhosts
+EOF
+
+	cat > $TARGET_MNT_POINT/etc/sysconfig/network << EOM
+GATEWAYDEV=eth0
+NETWORKING=yes
+FORWARD_IPV4=true
+DOMAINNAME=$HOST_NAME
+HOSTNAME=$HOST_NAME
+#GATEWAY=192.168.1.1
+EOM
+
+	# create "real" /tmp with mode 1777
+	rm -f $TARGET_MNT_POINT/tmp 2>/dev/null
+	mkdir -p $TARGET_MNT_POINT/tmp
+	chmod 1777 $TARGET_MNT_POINT/tmp
+
+	# create /etc/mtab as a regular file
+	rm -f $TARGET_MNT_POINT/etc/mtab
+	touch $TARGET_MNT_POINT/etc/mtab
+}
+
+system_services()
+{
+	#SYSTEM_SERVICES_D="sysklogd:10:90 klogd:11:90 kerneld:12:12 ppp:14:14 pcmcia:15:15 logoutd:20:20 makedev:20:20 atd:89:89 cron:89:11"
+
+	## start services wanted in config ...
+	#for i in $SERVICES_START
+	#do
+	#	chroot_it update-rc.d $i defaults 2>/dev/null >/dev/null # shut up
+	#done
+
+	## Add default scripts to runlevels
+	#for i in $SYSTEM_SERVICES_D
+	#do
+	#	SYSTEM_SERVICE=$(echo $i | cut -d: -f1)
+	#	SYSTEM_START=$(echo $i | cut -d: -f2)
+	#	SYSTEM_STOP=$(echo $i | cut -d: -f3)
+	#	chroot_it update-rc.d $SYSTEM_SERVICE defaults $SYSTEM_START $SYSTEM_STOP 2>/dev/null >/dev/null
+	#done
+
+	chroot "$TARGET_MNT_POINT" /sbin/chkconfig xinetd off
+
+	# PCMCIA
+	grep -q pcmcia /proc/devices || chroot $TARGET_MNT_POINT -c "chkconfig pcmcia off"
+
+	# ACPI
+	[ -d /proc/acpi -a -x /etc/init.d/acpid ] || chroot $TARGET_MNT_POINT -c "chkconfig acpid off"
+}

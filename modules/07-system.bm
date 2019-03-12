@@ -1,0 +1,71 @@
+#!/bin/bash
+
+module_system_defaults()
+{
+  register_var "SYSTEM_TYPE" $"Determines if the system is a redhat-derivate, a copy from CD or a nice mix of both" "berry|beginner|redhat" "" "redhat"
+  module_system_set_modules
+}
+
+module_system_showinfo()
+{
+  echo $"System-Options:"
+  echo "  " $"The installed system will be a $SYSTEM_TYPE type system."
+}
+
+module_system()
+{
+  module_system_defaults
+
+  DEB_CB="off"
+  BEG_CB="off"
+  KNX_CB="off"
+
+  [ "$SYSTEM_TYPE" = "beginner" ] && BEG_CB="on"
+  [ "$SYSTEM_TYPE" = "berry" ] && BRY_CB="on"
+  [ "$SYSTEM_TYPE" = "redhat" ] && RED_CB="on"
+
+  #radiolist $"Here you must choose the type of your system. A Beginner System will have hwdetection, but also support multiple users. A berry system will work exactly as from CD, but tools like apt-get do work. Redhat-Type however is a full featured debian system and works like the 'old installer'." $"Choose your system type" \
+  #"beginner" $"Multi-User System with hw-detection (preferred way)" "$BEG_CB" \
+  #"berry" $"Berry Linux system like from CD" "$BRY_CB" \
+  #"redhat" $"Redhat-like system (old installer way)" "$RED_CB"
+  #[ $? -eq 1 ] && return 1
+
+  #SYSTEM_TYPE=$(cat $TMP)
+  SYSTEM_TYPE="redhat"
+  [ -r "/$DEFAULT_DIR"/etc/berry-release ] && SYSTEM_TYPE="berry"
+
+  SYSTEM_MODULE="configured"
+  register_vars "SYSTEM_MODULE SYSTEM_TYPE"
+  return 0
+}
+
+module_system_set_modules()
+{
+	case "$SYSTEM_TYPE" in
+	berry)
+		#MODULES=(hd swap services boot)
+		MODULES=(hd swap name user userpass rootpass host boot)
+	;;
+	redhat|beginner|woody)
+		MODULES=(hd swap name user userpass rootpass host services boot)
+	esac
+	NUM_MODULES=${#MODULES[@]}
+}
+
+module_system_get_cmdlines()
+{
+	case "$SYSTEM_TYPE" in
+	berry|beginner)
+		echo $(cat /proc/cmdline | sed 's/vga=[^ ]* //g; s/initrd=[^ ]* //g; s/BOOT_IMAGE=[^ ]* //g; s/BOOT_FILE=[^ ]* //g; s/ro //g; s/root=[^ ]* //g; s/boot=[^ ]*//g; s/noinitrd//g')
+	;;
+	redhat)
+		SYSTEM_RESCUE_CMDS="acpi|noapic|nosmp|pci|pnpbios|noapm|devfs"
+		SYSTEM_RESCUE_CMDLINE=$(cat /proc/cmdline | tr ' ' '\n' | egrep "$SYSTEM_RESCUE_CMDS" |  tr '\n' ' ')
+		#echo "ramdisk_size=100000 lang=ja nomce $SYSTEM_RESCUE_CMDLINE"
+		#echo "$SYSTEM_RESCUE_CMDLINE"
+		GRUB_VGA=$(getbootparam vga)
+		[ -z "$GRUB_VGA" ] && GRUB_VGA="791"
+		echo "vga=$GRUB_VGA quiet $SYSTEM_RESCUE_CMDLINE"
+	;;
+	esac
+}
