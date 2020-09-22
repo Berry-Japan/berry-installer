@@ -55,7 +55,9 @@ function find_root_partitions
   ##fdisk_l | sed 's/*//g' | grep -v "swap" | sed 's/+//g' | awk '/Linux/ { if ($4>='"$ROOT_MIN"') { print $1 " " $4; if ("'"$FIND"'"==$1) { print " on" } else { print " off"}} }'
   #LANG=C fdisk -l | sed 's/*//g' | grep -v "swap" | sed 's/+//g' | awk '/Linux/ { if ($4>='"$ROOT_MIN"') { print $1 " " $4; if ("'"$FIND"'"==$1) { print " on" } else { print " off"}} }'
   #/opt/berry/fs | grep -v "swap" | awk '/Linux/ { if ($4>='"$ROOT_MIN"') { print $1 " " $4; if ("'"$FIND"'"==$1) { print " on" } else { print " off"}} }'
-  lsblk -fnr | grep -v "swap" | awk '/ext[3-9]/ { if ($3>='"$ROOT_MIN"') { print "/dev/" $1 " " $3; if ("'"$FIND"'"==$1) { print " on" } else { print " off"}} }'
+  #lsblk -fnr | grep -v "swap" | awk '/ext[3-9]/ { if ($3>='"$ROOT_MIN"') { print "/dev/" $1 " " $3; if ("'"$FIND"'"==$1) { print " on" } else { print " off"}} }'
+  lsblk -fnrb -o NAME,FSTYPE,SIZE | grep -v "swap" | awk '{ if ($3>='"$ROOT_MIN"') { print "/dev/" $1 " " $3 " on" } }'
+
   if [ -f /proc/mdstat ]
   then
     PARTS=$(file -s /dev/md* | grep -v "swap" | awk -F: '{ print $1 }' | tr \\n "\|" | sed 's%/dev/%%g; s/|$//g')

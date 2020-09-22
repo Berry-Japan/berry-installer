@@ -1,5 +1,5 @@
 %define name berry-installer
-%define version 0.35
+%define version 0.36
 %define release b1
 
 Name:		%{name}
@@ -11,6 +11,7 @@ Group:		System/Tools
 Source:		%{name}-%{version}.tar.bz2
 Buildroot:	%{_tmppath}/%{name}-%{version}
 #Requires:	lilo Xdialog
+BuildRequires:	gettext
 BuildArchitectures: noarch
 
 %description
